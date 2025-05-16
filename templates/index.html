@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Gerenciamento de Hotéis</title>
+<link rel="static" href="styles_index.css" />
+</head>
+<body>
+<header>
+  <h1>Gerenciamento de Hotéis</h1>
+  <p>Cadastre-se, pesquise e descubra os melhores hotéis</p>
+</header>
+
+<main>
+  <section id="registration-section">
+    <h2>Cadastro do Usuário</h2>
+    <form id="registrationForm">
+      <label for="username">Nome:</label>
+      <input type="text" id="username" name="username" placeholder="Digite seu nome" autocomplete="off" required />
+      <label for="userlocation">Local onde está:</label>
+      <input type="text" id="userlocation" name="userlocation" placeholder="Cidade, estado..." autocomplete="off" required />
+      <button type="submit">Cadastrar</button>
+    </form>
+    <p id="message"></p>
+  </section>
+
+  <section id="search-section" style="display:none;">
+    <h2>Pesquisar Hotel</h2>
+    <input type="text" id="searchInput" placeholder="Digite o nome do hotel que deseja pesquisar" autocomplete="off" />
+  </section>
+
+  <section id="tabs-section" style="display:none;">
+    <h2>Hotéis</h2>
+    <div class="tabs">
+      <div class="tab active" data-tab="mais-avaliados">Mais Avaliados</div>
+      <div class="tab" data-tab="menos-avaliados">Menos Avaliados</div>
+      <div class="tab" data-tab="mais-caros">Mais Caros</div>
+      <div class="tab" data-tab="mais-baratos">Mais Baratos</div>
+    </div>
+    <div id="hotelList" class="hotel-list"></div>
+  </section>
+</main>
+
+<script>
+  // Simulated hotel data with images
+  const hotels = [
+    { name: "Hotel Luxor", location: "São Paulo", rating: 4.8, price: 880, image: "https://images.unsplash.com/photo-1501117716987-c8bfdfe02a72?auto=format&fit=crop&w=800&q=80" },
+    { name: "Resort Atlântico", location: "Rio de Janeiro", rating: 4.6, price: 650, image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80" },
+    { name: "Pousada do Sol", location: "Salvador", rating: 3.9, price: 320, image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80" },
+    { name: "Hotel Paraíso", location: "Fortaleza", rating: 4.2, price: 470, image: "https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=800&q=80" },
+    { name: "Grande Hotel", location: "Brasília", rating: 4.4, price: 530, image: "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=800&q=80" },
+    { name: "Laguna Resort", location: "Balneário Camboriú", rating: 4.9, price: 920, image: "https://images.unsplash.com/photo-1501183638714-46b60a6009c9?auto=format&fit=crop&w=800&q=80" },
+    { name: "Hotel Marazul", location: "Recife", rating: 3.5, price: 280, image: "https://images.unsplash.com/photo-1486308510493-cb24e86d0b57?auto=format&fit=crop&w=800&q=80" },
+    { name: "Pousada Bem-Estar", location: "Florianópolis", rating: 4.1, price: 400, image: "https://images.unsplash.com/photo-1491553895911-0055eca6402d?auto=format&fit=crop&w=800&q=80" },
+    { name: "Hotel Central", location: "Curitiba", rating: 3.8, price: 360, image: "https://images.unsplash.com/photo-1494522358652-6bb176d6447a?auto=format&fit=crop&w=800&q=80" },
+    { name: "Resort do Vale", location: "Gramado", rating: 4.7, price: 950, image: "https://images.unsplash.com/photo-1505692794400-4a95a3b13e71?auto=format&fit=crop&w=800&q=80" }
+  ];
+
+  let currentUser = null;
+  const registrationForm = document.getElementById('registrationForm');
+  const messageEl = document.getElementById('message');
+  const searchSection = document.getElementById('search-section');
+  const tabsSection = document.getElementById('tabs-section');
+  const searchInput = document.getElementById('searchInput');
+  const hotelList = document.getElementById('hotelList');
+  const tabs = document.querySelectorAll('.tab');
+  let activeTab = 'mais-avaliados';
+
+  // Registration handler
+  registrationForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const username = e.target.username.value.trim();
+    const userlocation = e.target.userlocation.value.trim();
+    if (username && userlocation) {
+      currentUser = { name: username, location: userlocation };
+      messageEl.style.color = 'green';
+      messageEl.textContent = `Olá, ${username}! Cadastro realizado com sucesso.`;
+      registrationForm.style.display = 'none';
+      searchSection.style.display = 'block';
+      tabsSection.style.display = 'block';
+      renderHotelList();
+    } else {
+      messageEl.style.color = 'red';
+      messageEl.textContent = 'Por favor, preencha todos os campos.';
+    }
+  });
+
+  // Render list of hotels according to active tab and search filter
+  function renderHotelList() {
+    let filteredHotels = hotels;
+
+    // Filter by search input
+    const query = searchInput.value.trim().toLowerCase();
+    if (query !== '') {
+      filteredHotels = filteredHotels.filter(hotel => hotel.name.toLowerCase().includes(query));
+    }
+
+    // Sort according to active tab
+    switch(activeTab) {
+      case 'mais-avaliados':
+        filteredHotels = filteredHotels.slice().sort((a, b) => b.rating - a.rating);
+        break;
+      case 'menos-avaliados':
+        filteredHotels = filteredHotels.slice().sort((a, b) => a.rating - b.rating);
+        break;
+      case 'mais-caros':
+        filteredHotels = filteredHotels.slice().sort((a, b) => b.price - a.price);
+        break;
+      case 'mais-baratos':
+        filteredHotels = filteredHotels.slice().sort((a, b) => a.price - b.price);
+        break;
+      default:
+        break;
+    }
+
+    // If no hotels found:
+    if (filteredHotels.length === 0) {
+      hotelList.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color: #999;">Nenhum hotel encontrado</p>';
+      return;
+    }
+
+    // Build hotel cards
+    hotelList.innerHTML = filteredHotels.map(hotel => {
+      return `
+        <div class="hotel-card">
+          <img src="${hotel.image}" alt="Imagem do ${hotel.name}" loading="lazy" />
+          <div class="hotel-name">${hotel.name}</div>
+          <div class="hotel-location">${hotel.location}</div>
+          <div class="hotel-info">
+            <span class="rating">Avaliação: ${hotel.rating.toFixed(1)}/5 ⭐</span>
+            <span class="price">R$ ${hotel.price.toLocaleString('pt-BR')}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Tab click handler
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      if (tab.classList.contains('active')) return;
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      activeTab = tab.getAttribute('data-tab');
+      renderHotelList();
+    });
+  });
+
+  // Search input handler
+  searchInput.addEventListener('input', () => {
+    renderHotelList();
+  });
+</script>
+</body>
+</html>
