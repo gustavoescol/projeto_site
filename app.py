@@ -36,10 +36,10 @@ def add_cadastro():
     nome = request.form['nome']
     senha = request.form['password']
     endereco = request.form['endereco']
-    telefone = request.form['telefone']
+    cpf = request.form['cpf']
+    datanasc = request.form['datanasc']
 
-    print(f"cadastro realizado com sucesso: {email}, {nome}, {senha}, {endereco}, {telefone}")
-    return redirect('/servicos')
+    return print(f"cadastro realizado com sucesso: {email}, {nome}, {senha}, {endereco}, {cpf}, {datanasc}")
 
 if __name__ == '__main__':
     app.run(debug=True)
