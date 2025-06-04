@@ -26,8 +26,16 @@ def add_cadastro():
     nome = request.form.get('nome')
     email = request.form.get('email')
     senha = request.form.get('senha')
+    endereco = request.form.get('endereco')
+    datanasc = request.form.get('datanasc')
+    cpf = request.form.get('cpf')
 
     session['usuario'] = {
+        'nome': nome,
         'email': email,
+        'senha': senha,
+        'endereco': endereco,
+        'datanasc': datanasc,
+        'cpf': cpf
  
     }
