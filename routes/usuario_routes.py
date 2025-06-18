@@ -1,21 +1,32 @@
 from flask import Blueprint, render_template, request, redirect, session, url_for
 
-usuario_bp = Blueprint('usuarios', __name__)
+usuario_bp = Blueprint('usuario', __name__)
+
+USERS = {
+    'gustavo': "lindinho" }
 
 @usuario_bp.route('/login')
 def login():
     return render_template('login.html')
 
+@usuario_bp.route('/servicos')
+def servicos():
+    return render_template('servicos.html', nomeuser = "Gustavo")
+
 @usuario_bp.route('/acesso', methods=['POST'])
 def acesso():
-    email = request.form.get('email')
-    senha = request.form.get('senha')
+    username = request.form['username']
+    password = request.form['password']
 
-    if email == 'gustavo@' and senha == '123':
-        return redirect('/servicos')
+
+    session['usuario'] = username
+
+    if username in USERS and USERS[username] == password:
+        session['usuario'] = username
+        return redirect(url_for('usuario.servicos'))
     else:
-        print('usuario nao encontrado')
-        return "Usuário não encontrado", 404
+        session.pop('usuario', None)
+        return 'Usuário ou senha inválidos', 401
 
 @usuario_bp.route('/cadastro')
 def cadastro():

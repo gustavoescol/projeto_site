@@ -4,9 +4,9 @@ from routes.usuario_routes import usuario_bp
 
 
 app = Flask(__name__)
-
+app.secret_key = 'lindinho'
 app.register_blueprint(main_bp)
-app.register_blueprint(usuario_bp)
+app.register_blueprint(usuario_bp, url_prefix='/usuario')
 
 
 if __name__ == '__main__':

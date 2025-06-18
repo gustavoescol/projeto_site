@@ -9,7 +9,7 @@
 <body>
   <div class="container">
     <h2>Cadastro de Usuário</h2>
-    <form id="cadastroForm", action="/add_cadastro" method="POST">
+    <form id="cadastroForm" method="POST" action="{{ url_for('usuario.cadastro') }}">
       <label for="nome">Nome</label>
       <input type="text" id="nome" name="nome" placeholder="Seu nome completo" required />
       <div class="error-message" id="nomeError">Por favor, insira seu nome.</div>
